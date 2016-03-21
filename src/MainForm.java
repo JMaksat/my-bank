@@ -19,9 +19,6 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
-/**
- * Created by Maxwell on 03/01/2016.
- */
 public class MainForm implements TableModelListener {
 
     JFrame mainFrm;
@@ -31,7 +28,7 @@ public class MainForm implements TableModelListener {
     JButton buttonExit;
     JButton buttonBlock;
     JButton buttonAccounts;
-    JButton buttonAddress;
+    JButton buttonTransaction;
     JButton buttonContacts;
     JPanel panel;
     private JMenuBar     menuBar;
@@ -103,35 +100,10 @@ public class MainForm implements TableModelListener {
         mainTable.setRowSelectionAllowed(true);
         mainTable.getSelectionModel().addListSelectionListener(new RowListener());
 
-        Vector<TableColumn> vt = new Vector<TableColumn>();
-        vt.addElement(mainTable.getColumnModel().getColumn(0));
-        vt.addElement(mainTable.getColumnModel().getColumn(1));
-        vt.addElement(mainTable.getColumnModel().getColumn(2));
-        vt.addElement(mainTable.getColumnModel().getColumn(3));
-        vt.addElement(mainTable.getColumnModel().getColumn(4));
-        vt.addElement(mainTable.getColumnModel().getColumn(5));
-        Enumeration<TableColumn> en = vt.elements();
-        while (en.hasMoreElements()) {
-            TableColumn tc = en.nextElement();
-                tc.setCellRenderer(new DefaultTableCellRenderer() {
-                    public Component getTableCellRendererComponent(
-                            JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-                        JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-                        if (((Vector) mainTableModel.allRows.get(row)).get(8).equals("f")) {
-                            label.setForeground(Color.GRAY);
-                        } else {
-                            label.setForeground(Color.BLACK);
-                        }
-                        return label;
-                    }
-                });
-        }
-
-        initColumnSizes(mainTable);
+        initColumnSizes();
 
         panel = new JPanel();
         panel.setBounds(5, 5, (int) dim.getWidth() + 5, (int) dim.getHeight() + 5);
-
 
         JScrollPane scrollPane = new JScrollPane(mainTable);
         panel.add(scrollPane);
@@ -139,16 +111,16 @@ public class MainForm implements TableModelListener {
 
         mainTableModel.addTableModelListener(this);
 
-        buttonAddress = new JButton("Addresses");
-        buttonAddress.setEnabled(true);
-        buttonAddress.setBounds(horizTop + 15, vertTop + 540, 120, 22);
-        buttonAddress.addActionListener(new ActionListener() {
+        buttonTransaction = new JButton("Transaction");
+        buttonTransaction.setEnabled(true);
+        buttonTransaction.setBounds(horizTop + 15, vertTop + 540, 120, 22);
+        buttonTransaction.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                addTransaction();
             }
         });
-        mainFrm.add(buttonAddress);
+        mainFrm.add(buttonTransaction);
 
         buttonContacts = new JButton("Contacts");
         buttonContacts.setEnabled(true);
@@ -156,7 +128,7 @@ public class MainForm implements TableModelListener {
         buttonContacts.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                contactList(mainTableModel);
             }
         });
         mainFrm.add(buttonContacts);
@@ -235,60 +207,108 @@ public class MainForm implements TableModelListener {
             }
             column = mainTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
             row = mainTable.getSelectionModel().getLeadSelectionIndex();
-            MainTableModel model = (MainTableModel) mainTable.getModel();
-            String columnName = model.getColumnName(column);
-            Object data = model.getValueAt(row, column);
 
-            checkBlocked(model);
+            if ((row > -1) && (column > -1)) {
+                MainTableModel model = (MainTableModel) mainTable.getModel();
+                String columnName = model.getColumnName(column);
+                Object data = model.getValueAt(row, column);
+                checkBlocked(model);
+            }
         }
     }
 
     private void checkBlocked(MainTableModel model) {
-        if (((Vector) model.allRows.get(row)).get(8).equals("f")) {
-            buttonBlock.setText("Unblock client");
-            isBlocked = true;
-        } else {
-            buttonBlock.setText("Block client");
-            isBlocked = false;
+        if (mainTable.isRowSelected(row)) {
+            if (((Vector) model.allRows.get(row)).get(8).equals("f")) {
+                buttonBlock.setText("Unblock client");
+                isBlocked = true;
+            } else {
+                buttonBlock.setText("Block client");
+                isBlocked = false;
+            }
         }
     }
 
     private void unblockCustomer(MainTableModel model) {
-        if (isBlocked) {
-            dbc.unblockCustomer((int) model.getValueAt(row, 0), true);
-            ((Vector)model.allRows.get(row)).set(8, "t");
-        } else {
-            dbc.unblockCustomer((int) model.getValueAt(row, 0), false);
-            ((Vector)model.allRows.get(row)).set(8, "f");
+        if (mainTable.isRowSelected(row)) {
+            if (isBlocked) {
+                dbc.unblockCustomer((int) model.getValueAt(row, 0), true);
+                ((Vector) model.allRows.get(row)).set(8, "t");
+            } else {
+                dbc.unblockCustomer((int) model.getValueAt(row, 0), false);
+                ((Vector) model.allRows.get(row)).set(8, "f");
+            }
+            model.fireTableCellUpdated(row, column);
         }
-        model.fireTableCellUpdated(row, column);
     }
 
     private void addCustomer() {
         NewCustomer nc = new NewCustomer(dbc);
-        //nc.setVisible(true);
-        mainTableModel.fireTableRowsInserted();
+        mainTableModel = new MainTableModel(dbc);
+        mainTable.setModel(mainTableModel);
+        initColumnSizes();
+    }
+
+    private void addTransaction() {
+        NewTransaction na = new NewTransaction(dbc);
+        mainTableModel = new MainTableModel(dbc);
+        mainTable.setModel(mainTableModel);
+        initColumnSizes();
+    }
+
+    private void contactList(MainTableModel model) {
+        CustomerContacts cc = new CustomerContacts(dbc, (int) model.getValueAt(row, 0));
+        mainTableModel = new MainTableModel(dbc);
+        mainTable.setModel(mainTableModel);
+        initColumnSizes();
     }
 
     private void accountsList(MainTableModel model) {
-        CustomerAccounts ca = new CustomerAccounts(dbc, (int) model.getValueAt(row, 0));
+        if (mainTable.isRowSelected(row)) {
+            CustomerAccounts ca = new CustomerAccounts(dbc, (int) model.getValueAt(row, 0));
+        }
+
     }
 
-    private void initColumnSizes(JTable table) {
+    private void initColumnSizes() {
+        Vector<TableColumn> vt = new Vector<TableColumn>();
+        vt.addElement(mainTable.getColumnModel().getColumn(0));
+        vt.addElement(mainTable.getColumnModel().getColumn(1));
+        vt.addElement(mainTable.getColumnModel().getColumn(2));
+        vt.addElement(mainTable.getColumnModel().getColumn(3));
+        vt.addElement(mainTable.getColumnModel().getColumn(4));
+        vt.addElement(mainTable.getColumnModel().getColumn(5));
+        Enumeration<TableColumn> en = vt.elements();
+        while (en.hasMoreElements()) {
+            TableColumn tc = en.nextElement();
+            tc.setCellRenderer(new DefaultTableCellRenderer() {
+                public Component getTableCellRendererComponent(
+                        JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+                    JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+                    if (((Vector) mainTableModel.allRows.get(row)).get(8).equals("f")) {
+                        label.setForeground(Color.GRAY);
+                    } else {
+                        label.setForeground(Color.BLACK);
+                    }
+                    return label;
+                }
+            });
+        }
+
         TableColumn column = null;
-        column = table.getColumnModel().getColumn(0);
+        column = mainTable.getColumnModel().getColumn(0);
         column.setPreferredWidth(50);
-        column = table.getColumnModel().getColumn(1);
-        column.setPreferredWidth(150);
-        column = table.getColumnModel().getColumn(2);
-        column.setPreferredWidth(150);
-        column = table.getColumnModel().getColumn(3);
-        column.setPreferredWidth(150);
-        column = table.getColumnModel().getColumn(4);
+        column = mainTable.getColumnModel().getColumn(1);
+        column.setPreferredWidth(140);
+        column = mainTable.getColumnModel().getColumn(2);
+        column.setPreferredWidth(140);
+        column = mainTable.getColumnModel().getColumn(3);
+        column.setPreferredWidth(140);
+        column = mainTable.getColumnModel().getColumn(4);
         column.setPreferredWidth(80);
-        column = table.getColumnModel().getColumn(5);
+        column = mainTable.getColumnModel().getColumn(5);
         column.setPreferredWidth(150);
-        column = table.getColumnModel().getColumn(6);
+        column = mainTable.getColumnModel().getColumn(6);
         column.setPreferredWidth(50);
     }
 
@@ -322,10 +342,6 @@ public class MainForm implements TableModelListener {
             try {
                 ResultSetMetaData meta = rs.getMetaData();
                 allCols = meta.getColumnCount();
-                /*
-                for (int h = 1; h <= colCount; h++) {
-                    headers.addElement(meta.getColumnName(h));
-                }*/
 
                 while (rs.next()) {
                     Vector<String> allRec = new Vector<String>();

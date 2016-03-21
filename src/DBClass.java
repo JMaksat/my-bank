@@ -99,7 +99,7 @@ public class DBClass {
             }
             stmt.close();
 
-        } catch(SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't insert customer info!");
         }
@@ -136,15 +136,42 @@ public class DBClass {
             }
             stmt.close();
 
-        } catch(SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't update customer info!");
         }
     }
 
 
+    public void updateAccountInfo(int accountID,
+                                  boolean accountSuspended) {
+        try {
+            String sql = "{? = call bank.update_account_info(?,?)}";
+
+            conn.setSavepoint();
+
+            stmt = conn.prepareCall(sql);
+            stmt.registerOutParameter(1, Types.BOOLEAN);
+            stmt.setInt(2, accountID);
+            stmt.setBoolean(3, accountSuspended);
+            stmt.execute();
+
+            if (stmt.getBoolean(1)) {
+                conn.commit();
+            } else {
+                conn.rollback();
+            }
+            stmt.close();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't update account info!");
+        }
+    }
+
+
     public void unblockCustomer(int customerID,
-                              Boolean isActive) {
+                                Boolean isActive) {
         try {
             String sql = "{? = call bank.change_customer_activity(?,?)}";
 
@@ -163,7 +190,7 @@ public class DBClass {
             }
             stmt.close();
 
-        } catch(SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't block/unblock customer info!");
         }
@@ -222,6 +249,32 @@ public class DBClass {
     }
 
 
+    public ResultSet getAccountTransactions(int accountID) {
+        ResultSet rs = null;
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_account_transactions(?) }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, accountID);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain transaction list!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+
     public Vector getAccountTypes() {
         ResultSet rs = null;
         Vector vc = new Vector();
@@ -238,13 +291,107 @@ public class DBClass {
             stmt.close();
 
 
-            while(rs.next()) {
+            while (rs.next()) {
                 vc.addElement(new Item(rs.getInt(1), rs.getString(2)));
             }
 
         } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't obtain account types!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return vc;
+    }
+
+
+    public Vector getCustomerAccountList(int customerID) {
+        ResultSet rs = null;
+        Vector vc = new Vector();
+
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_account_list(?) }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, customerID);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+            while (rs.next()) {
+                vc.addElement(new Item(rs.getInt(1), rs.getString(2)));
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain accounts list!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return vc;
+    }
+
+
+    public Vector getAllAccountList() {
+        ResultSet rs = null;
+        Vector vc = new Vector();
+
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_all_accounts() }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+            while (rs.next()) {
+                vc.addElement(new Item(rs.getInt(1), rs.getString(2)));
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain accounts list!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return vc;
+    }
+
+
+    public Vector getTransactionTypes() {
+        ResultSet rs = null;
+        Vector vc = new Vector();
+
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_transaction_types() }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+            while (rs.next()) {
+                vc.addElement(new Item(rs.getInt(1), rs.getString(2)));
+            }
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain transaction types!");
         } catch (Exception e) {
             cache = new Vector();
             e.printStackTrace();
@@ -281,9 +428,99 @@ public class DBClass {
             }
             stmt.close();
 
-        } catch(SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't insert account info!");
+        }
+    }
+
+
+    public ResultSet getContacts(int customerID) {
+        ResultSet rs = null;
+
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_contacts(?) }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, customerID);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain contacts list!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+
+    public ResultSet getAddress(int customerID) {
+        ResultSet rs = null;
+
+        try {
+            conn.setAutoCommit(false);
+
+            CallableStatement stmt = conn.prepareCall("{ ? = call bank.get_address(?) }");
+            stmt.registerOutParameter(1, Types.OTHER);
+            stmt.setInt(2, customerID);
+            stmt.execute();
+
+            rs = (ResultSet) stmt.getObject(1);
+
+            stmt.close();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't obtain adress list!");
+        } catch (Exception e) {
+            cache = new Vector();
+            e.printStackTrace();
+        }
+
+        return rs;
+    }
+
+
+    public void insertTransactionInfo(int operationType,
+                                      boolean isReversed,
+                                      float transactionSum,
+                                      int accountDebit,
+                                      int accountCredit) {
+        try {
+            String sql = "{? = call bank.insert_transaction_info(?,?,?,?,?)}";
+
+            conn.setSavepoint();
+
+            stmt = conn.prepareCall(sql);
+            stmt.registerOutParameter(1, Types.INTEGER);
+            stmt.setInt(2, operationType);
+            stmt.setBoolean(3, isReversed);
+            stmt.setFloat(4, transactionSum);
+            stmt.setInt(5, accountDebit);
+            stmt.setInt(6, accountCredit);
+            stmt.execute();
+            System.out.println(stmt.getInt(1));
+            if (stmt.getInt(1) >= 0) {
+                conn.commit();
+            } else {
+                conn.rollback();
+                if (stmt.getInt(1) == -2) {
+                    JOptionPane.showMessageDialog(null, "Insufficient funds on debit account!");
+                }
+            }
+            stmt.close();
+
+        } catch (SQLException se) {
+            se.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Can't insert transaction info!");
         }
     }
 
@@ -293,7 +530,7 @@ public class DBClass {
             if (conn != null) {
                 conn.close();
             }
-        } catch(SQLException se) {
+        } catch (SQLException se) {
             se.printStackTrace();
             JOptionPane.showMessageDialog(null, "Can't close database connection!");
         }

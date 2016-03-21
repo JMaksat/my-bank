@@ -57,7 +57,7 @@ public class CustomerAccounts implements TableModelListener{
         accountTable.setRowSelectionAllowed(true);
         accountTable.getSelectionModel().addListSelectionListener(new RowListener());
 
-        initColumnSizes(accountTable);
+        initColumnSizes();
 
         panel = new JPanel();
         panel.setBounds(5, 5, (int) dim.getWidth() + 5, (int) dim.getHeight() + 5);
@@ -86,7 +86,7 @@ public class CustomerAccounts implements TableModelListener{
         buttonTransactions.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                transactionList(accountTableModel);
             }
         });
         dlg.add(buttonTransactions);
@@ -97,18 +97,20 @@ public class CustomerAccounts implements TableModelListener{
 
     private void addAccount() {
         NewAccount na = new NewAccount(dbc, customerID);
+        accountTableModel = new AccountTableModel(dbc, customerID);
+        accountTable.setModel(accountTableModel);
+        initColumnSizes();
     }
 
     public void tableChanged(TableModelEvent e) {
-
         row = e.getFirstRow();
         column = e.getColumn();
         AccountTableModel model = (AccountTableModel)e.getSource();
         String columnName = model.getColumnName(column);
         Object data = model.getValueAt(row, column);
 
-        //dbc.updateAccountInfo((int) model.getValueAt(row, 0));
-
+        dbc.updateAccountInfo((int) model.getValueAt(row, 0),
+                (boolean) model.getValueAt(row, 4));
     }
 
 
@@ -117,32 +119,36 @@ public class CustomerAccounts implements TableModelListener{
             if (event.getValueIsAdjusting()) {
                 return;
             }
-            /*
-            column = mainTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-            row = mainTable.getSelectionModel().getLeadSelectionIndex();
-            MainTableModel model = (MainTableModel) mainTable.getModel();
+            column = accountTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+            row = accountTable.getSelectionModel().getLeadSelectionIndex();
+            AccountTableModel model = (AccountTableModel) accountTable.getModel();
             String columnName = model.getColumnName(column);
             Object data = model.getValueAt(row, column);
-
-            checkBlocked(model);
-            */
         }
     }
 
-    private void initColumnSizes(JTable table) {
+
+    private void initColumnSizes() {
         TableColumn column = null;
-        column = table.getColumnModel().getColumn(0);
+        column = accountTable.getColumnModel().getColumn(0);
         column.setPreferredWidth(30);
-        column = table.getColumnModel().getColumn(1);
+        column = accountTable.getColumnModel().getColumn(1);
         column.setPreferredWidth(120);
-        column = table.getColumnModel().getColumn(2);
+        column = accountTable.getColumnModel().getColumn(2);
         column.setPreferredWidth(70);
-        column = table.getColumnModel().getColumn(3);
+        column = accountTable.getColumnModel().getColumn(3);
         column.setPreferredWidth(70);
-        column = table.getColumnModel().getColumn(4);
+        column = accountTable.getColumnModel().getColumn(4);
         column.setPreferredWidth(60);
-        column = table.getColumnModel().getColumn(5);
+        column = accountTable.getColumnModel().getColumn(5);
         column.setPreferredWidth(80);
+    }
+
+
+    private void transactionList(AccountTableModel model) {
+        if (accountTable.isRowSelected(row)) {
+            AccountTransactions at = new AccountTransactions(dbc, (int) model.getValueAt(row, 0), customerID);
+        }
     }
 
 
@@ -212,7 +218,7 @@ public class CustomerAccounts implements TableModelListener{
         }
 
         public String getColumnName(int i) {
-            return headers.elementAt(i);
+            return headers.get(i);
         }
 
         @Override

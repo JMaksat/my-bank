@@ -11,9 +11,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
-/**
- * Created by Maxwell on 08/01/2016.
- */
 public class NewCustomer {
     DBClass dbc;
 
@@ -31,7 +28,6 @@ public class NewCustomer {
     Properties p;
     JDatePanelImpl datePanel;
     JDatePickerImpl datePicker;
-    //JTextField textBirthdate;
     JTextField textPersonalID;
     JCheckBox checkResident;
     JButton buttonOk;
@@ -99,11 +95,7 @@ public class NewCustomer {
         textMiddlename.setEnabled(true);
         textMiddlename.setBounds(editOffset, 80, editLength, 22);
         dlg.add(textMiddlename);
-/*
-        UtilDateModel model = new UtilDateModel();
-        JDatePanelImpl datePanel = new JDatePanelImpl(model);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel);
-*/
+
         model = new UtilDateModel();
         p = new Properties();
         p.put("text.today", "Today");
@@ -113,11 +105,6 @@ public class NewCustomer {
         datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
         datePicker.setBounds(editOffset, 107, editLength, 26);
         dlg.add(datePicker);
-/*
-        textBirthdate = new JTextField();
-        textBirthdate.setEnabled(true);
-        textBirthdate.setBounds(editOffset, 110, editLength, 22);
-        dlg.add(textBirthdate);*/
 
         textPersonalID = new JTextField();
         textPersonalID.setEnabled(true);
