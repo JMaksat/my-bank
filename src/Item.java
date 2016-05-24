@@ -1,26 +1,21 @@
-class Item
-{
+class Item {
     private int id;
     private String description;
 
-    public Item(int id, String description)
-    {
+    public Item(int id, String description) {
         this.id = id;
         this.description = description;
     }
 
-    public int getId()
-    {
+    public int getId() {
         return id;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return description;
     }
 }

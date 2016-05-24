@@ -3,8 +3,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class NewTransaction {
+    private final static String TITLE = "Adding new transaction";
     DBClass dbc;
-
     JDialog dlg;
     JLabel labelType;
     JLabel labelSum;
@@ -14,15 +14,11 @@ public class NewTransaction {
     JTextField textSum;
     JComboBox comboAccountDebit;
     JComboBox comboAccountCredit;
-
     JButton buttonOk;
     JButton buttonCancel;
-
     int editLength = 160;
     int editOffset = 120;
     int labelLength = 110;
-
-    private final static String TITLE = "Adding new transaction";
 
     public NewTransaction(DBClass dbc) {
         this.dbc = dbc;
@@ -138,9 +134,9 @@ public class NewTransaction {
     }
 
     private void insertData() {
-        Item itemType = (Item)comboType.getSelectedItem();
-        Item itemDebit = (Item)comboAccountDebit.getSelectedItem();
-        Item itemCredit = (Item)comboAccountCredit.getSelectedItem();
+        Item itemType = (Item) comboType.getSelectedItem();
+        Item itemDebit = (Item) comboAccountDebit.getSelectedItem();
+        Item itemCredit = (Item) comboAccountCredit.getSelectedItem();
 
         dbc.insertTransactionInfo(itemType.getId(),
                 false,

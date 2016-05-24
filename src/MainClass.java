@@ -3,10 +3,9 @@
  */
 public class MainClass {
 
+    public static Boolean runApp = false;
     DBClass dbc;
     LoginForm lf;
-
-    public static Boolean runApp = false;
 
     public MainClass() {
         lf = new LoginForm(dbc, this);

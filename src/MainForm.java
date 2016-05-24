@@ -1,5 +1,3 @@
-import sun.applet.Main;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -14,13 +12,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.Calendar;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.Vector;
 
 public class MainForm implements TableModelListener {
 
+    private final static String TITLE = "MyBank - Customer list";
     JFrame mainFrm;
     MainTableModel mainTableModel;
     JTable mainTable;
@@ -31,20 +28,16 @@ public class MainForm implements TableModelListener {
     JButton buttonTransaction;
     JButton buttonContacts;
     JPanel panel;
-    private JMenuBar     menuBar;
-    private JMenu        fileMenu;
-    private JMenuItem    menuItem;
-    private JMenuItem    aboutItem;
-
     DBClass dbc;
-
-    private final static String TITLE = "MyBank - Customer list";
-
     int horizTop = 0;
     int vertTop = -20;
     int column = -1;
     int row = -1;
     Boolean isBlocked = null;
+    private JMenuBar menuBar;
+    private JMenu fileMenu;
+    private JMenuItem menuItem;
+    private JMenuItem aboutItem;
 
     public MainForm(DBClass dbc) {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
@@ -186,7 +179,7 @@ public class MainForm implements TableModelListener {
     public void tableChanged(TableModelEvent e) {
         row = e.getFirstRow();
         column = e.getColumn();
-        MainTableModel model = (MainTableModel)e.getSource();
+        MainTableModel model = (MainTableModel) e.getSource();
         String columnName = model.getColumnName(column);
         Object data = model.getValueAt(row, column);
 
@@ -197,24 +190,6 @@ public class MainForm implements TableModelListener {
                 (java.sql.Date) model.getValueAt(row, 4),
                 (String) model.getValueAt(row, 5),
                 (Boolean) model.getValueAt(row, 6));
-    }
-
-
-    private class RowListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) {
-                return;
-            }
-            column = mainTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-            row = mainTable.getSelectionModel().getLeadSelectionIndex();
-
-            if ((row > -1) && (column > -1)) {
-                MainTableModel model = (MainTableModel) mainTable.getModel();
-                String columnName = model.getColumnName(column);
-                Object data = model.getValueAt(row, column);
-                checkBlocked(model);
-            }
-        }
     }
 
     private void checkBlocked(MainTableModel model) {
@@ -314,6 +289,23 @@ public class MainForm implements TableModelListener {
         column.setPreferredWidth(50);
     }
 
+    private class RowListener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
+            column = mainTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+            row = mainTable.getSelectionModel().getLeadSelectionIndex();
+
+            if ((row > -1) && (column > -1)) {
+                MainTableModel model = (MainTableModel) mainTable.getModel();
+                String columnName = model.getColumnName(column);
+                Object data = model.getValueAt(row, column);
+                checkBlocked(model);
+            }
+        }
+    }
+
     class MainTableModel extends AbstractTableModel {
         DBClass dbc;
         ResultSet rs = null;
@@ -387,7 +379,7 @@ public class MainForm implements TableModelListener {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return ((Vector)rows.get(rowIndex)).get(columnIndex);
+            return ((Vector) rows.get(rowIndex)).get(columnIndex);
         }
 
         public Class getColumnClass(int c) {
@@ -399,7 +391,7 @@ public class MainForm implements TableModelListener {
         }
 
         public void setValueAt(Object value, int row, int col) {
-            ((Vector)rows.get(row)).set(col, value);
+            ((Vector) rows.get(row)).set(col, value);
             fireTableCellUpdated(row, col);
         }
 

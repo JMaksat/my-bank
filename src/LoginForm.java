@@ -7,10 +7,9 @@ import java.awt.event.ActionListener;
  */
 public class LoginForm extends JFrame {
     private final static String TITLE = "Log in";
-    private JPanel logFrm;
     DBClass dbc;
     MainClass mc;
-
+    private JPanel logFrm;
     private JLabel labelUser;
     private JLabel labelPass;
     private JTextField editUser;

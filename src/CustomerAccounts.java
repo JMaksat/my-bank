@@ -15,23 +15,20 @@ import java.util.Vector;
 /**
  * Created by Maxwell on 08/01/2016.
  */
-public class CustomerAccounts implements TableModelListener{
+public class CustomerAccounts implements TableModelListener {
+    private final static String TITLE = "Customer accounts";
     DBClass dbc;
-
     JDialog dlg;
     JTable accountTable;
     AccountTableModel accountTableModel;
     JPanel panel;
     JButton buttonAddAccount;
     JButton buttonTransactions;
-
     int horizTop = 0;
     int vertTop = 0;
     int column = -1;
     int row = -1;
     int customerID;
-
-    private final static String TITLE = "Customer accounts";
 
     public CustomerAccounts(DBClass dbc, int customerID) {
         this.dbc = dbc;
@@ -105,28 +102,13 @@ public class CustomerAccounts implements TableModelListener{
     public void tableChanged(TableModelEvent e) {
         row = e.getFirstRow();
         column = e.getColumn();
-        AccountTableModel model = (AccountTableModel)e.getSource();
+        AccountTableModel model = (AccountTableModel) e.getSource();
         String columnName = model.getColumnName(column);
         Object data = model.getValueAt(row, column);
 
         dbc.updateAccountInfo((int) model.getValueAt(row, 0),
                 (boolean) model.getValueAt(row, 4));
     }
-
-
-    private class RowListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) {
-                return;
-            }
-            column = accountTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-            row = accountTable.getSelectionModel().getLeadSelectionIndex();
-            AccountTableModel model = (AccountTableModel) accountTable.getModel();
-            String columnName = model.getColumnName(column);
-            Object data = model.getValueAt(row, column);
-        }
-    }
-
 
     private void initColumnSizes() {
         TableColumn column = null;
@@ -144,13 +126,24 @@ public class CustomerAccounts implements TableModelListener{
         column.setPreferredWidth(80);
     }
 
-
     private void transactionList(AccountTableModel model) {
         if (accountTable.isRowSelected(row)) {
             AccountTransactions at = new AccountTransactions(dbc, (int) model.getValueAt(row, 0), customerID);
         }
     }
 
+    private class RowListener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
+            column = accountTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+            row = accountTable.getSelectionModel().getLeadSelectionIndex();
+            AccountTableModel model = (AccountTableModel) accountTable.getModel();
+            String columnName = model.getColumnName(column);
+            Object data = model.getValueAt(row, column);
+        }
+    }
 
     class AccountTableModel extends AbstractTableModel {
         DBClass dbc;
@@ -223,7 +216,7 @@ public class CustomerAccounts implements TableModelListener{
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return ((Vector)rows.get(rowIndex)).get(columnIndex);
+            return ((Vector) rows.get(rowIndex)).get(columnIndex);
         }
 
         public Class getColumnClass(int c) {
@@ -238,7 +231,7 @@ public class CustomerAccounts implements TableModelListener{
         }
 
         public void setValueAt(Object value, int row, int col) {
-            ((Vector)rows.get(row)).set(col, value);
+            ((Vector) rows.get(row)).set(col, value);
             fireTableCellUpdated(row, col);
         }
 

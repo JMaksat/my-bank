@@ -6,30 +6,25 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Vector;
 
 public class AccountTransactions implements TableModelListener {
+    private final static String TITLE = "Account transactions";
     DBClass dbc;
-
     JDialog dlg;
     JTable transactionTable;
     TransactionTableModel transactionTableModel;
-    JPanel panel;
     //JButton buttonReverse;
     // JButton buttonAddTransaction;
-
+    JPanel panel;
     int horizTop = 0;
     int vertTop = 0;
     int column = -1;
     int row = -1;
     int accountID;
     int customerID;
-
-    private final static String TITLE = "Account transactions";
 
     public AccountTransactions(DBClass dbc, int accountID, int customerID) {
         this.dbc = dbc;
@@ -74,23 +69,9 @@ public class AccountTransactions implements TableModelListener {
     public void tableChanged(TableModelEvent e) {
         row = e.getFirstRow();
         column = e.getColumn();
-        TransactionTableModel model = (TransactionTableModel)e.getSource();
+        TransactionTableModel model = (TransactionTableModel) e.getSource();
         String columnName = model.getColumnName(column);
         Object data = model.getValueAt(row, column);
-    }
-
-
-    private class RowListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            if (event.getValueIsAdjusting()) {
-                return;
-            }
-            column = transactionTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
-            row = transactionTable.getSelectionModel().getLeadSelectionIndex();
-            TransactionTableModel model = (TransactionTableModel) transactionTable.getModel();
-            String columnName = model.getColumnName(column);
-            Object data = model.getValueAt(row, column);
-        }
     }
 
     private void initColumnSizes() {
@@ -113,6 +94,18 @@ public class AccountTransactions implements TableModelListener {
         column.setPreferredWidth(150);
     }
 
+    private class RowListener implements ListSelectionListener {
+        public void valueChanged(ListSelectionEvent event) {
+            if (event.getValueIsAdjusting()) {
+                return;
+            }
+            column = transactionTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
+            row = transactionTable.getSelectionModel().getLeadSelectionIndex();
+            TransactionTableModel model = (TransactionTableModel) transactionTable.getModel();
+            String columnName = model.getColumnName(column);
+            Object data = model.getValueAt(row, column);
+        }
+    }
 
     class TransactionTableModel extends AbstractTableModel {
         DBClass dbc;
@@ -188,7 +181,7 @@ public class AccountTransactions implements TableModelListener {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return ((Vector)rows.get(rowIndex)).get(columnIndex);
+            return ((Vector) rows.get(rowIndex)).get(columnIndex);
         }
 
         public Class getColumnClass(int c) {
@@ -203,7 +196,7 @@ public class AccountTransactions implements TableModelListener {
         }
 
         public void setValueAt(Object value, int row, int col) {
-            ((Vector)rows.get(row)).set(col, value);
+            ((Vector) rows.get(row)).set(col, value);
             fireTableCellUpdated(row, col);
         }
 

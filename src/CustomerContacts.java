@@ -1,12 +1,7 @@
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Vector;
@@ -15,8 +10,8 @@ import java.util.Vector;
  * Created by Android on 18/03/2016.
  */
 public class CustomerContacts {
+    private final static String TITLE = "Customer contacts";
     DBClass dbc;
-
     JDialog dlg;
     JTable contactsTable;
     JTable addressTable;
@@ -26,14 +21,11 @@ public class CustomerContacts {
     JPanel panelAddress;
     JLabel labelContacts;
     JLabel labelAddress;
-
     int horizTop = 0;
     int vertTop = 0;
     int column = -1;
     int row = -1;
     int customerID;
-
-    private final static String TITLE = "Customer contacts";
 
     public CustomerContacts(DBClass dbc, int customerID) {
         this.dbc = dbc;

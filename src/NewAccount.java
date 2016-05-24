@@ -5,7 +5,6 @@ import org.jdatepicker.impl.UtilDateModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
@@ -14,8 +13,8 @@ import java.util.Properties;
  */
 public class NewAccount {
 
+    private final static String TITLE = "Adding new account";
     DBClass dbc;
-
     JDialog dlg;
     JLabel labelAccount;
     JLabel labelType;
@@ -24,18 +23,14 @@ public class NewAccount {
     JComboBox comboType;
     JButton buttonOk;
     JButton buttonCancel;
-
     UtilDateModel model;
     Properties p;
     JDatePanelImpl datePanel;
     JDatePickerImpl datePicker;
-
     int customerID;
     int editLength = 130;
     int editOffset = 120;
     int labelLength = 110;
-
-    private final static String TITLE = "Adding new account";
 
     public NewAccount(DBClass dbc, int customerID) {
         this.dbc = dbc;
@@ -115,7 +110,7 @@ public class NewAccount {
     }
 
     private void insertData() {
-        Item item = (Item)comboType.getSelectedItem();
+        Item item = (Item) comboType.getSelectedItem();
 
         dbc.insertAccountInfo(textAccount.getText(),
                 customerID,

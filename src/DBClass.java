@@ -1,10 +1,11 @@
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
-import java.sql.Date;
-import java.util.*;
-import javax.swing.JOptionPane;
+import java.util.Calendar;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Created by Maxwell on 02/01/2016.
@@ -14,13 +15,11 @@ public class DBClass {
     private static String db_url;
     private static String user_name;
     private static String user_pass;
-
-    private Connection conn = null;
-    private CallableStatement stmt = null;
-
     Vector cache;
     int colCount;
     Vector<String> headers;
+    private Connection conn = null;
+    private CallableStatement stmt = null;
 
     DBClass(String user_name, String user_pass) {
         this.user_name = user_name;

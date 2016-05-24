@@ -1,4 +1,3 @@
-import org.jdatepicker.JDatePicker;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -6,14 +5,12 @@ import org.jdatepicker.impl.UtilDateModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Date;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 
 public class NewCustomer {
+    private final static String TITLE = "Adding new customer";
     DBClass dbc;
-
     JDialog dlg;
     JLabel labelLastname;
     JLabel labelFirstname;
@@ -32,12 +29,9 @@ public class NewCustomer {
     JCheckBox checkResident;
     JButton buttonOk;
     JButton buttonCancel;
-
     int editLength = 130;
     int editOffset = 120;
     int labelLength = 110;
-
-    private final static String TITLE = "Adding new customer";
 
     public NewCustomer(DBClass dbc) {
         this.dbc = dbc;
