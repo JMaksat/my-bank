@@ -257,10 +257,12 @@ public class MainForm implements TableModelListener {
     }
 
     private void contactList(MainTableModel model) {
-        CustomerContacts cc = new CustomerContacts(dbc, (int) model.getValueAt(row, 0));
-        mainTableModel = new MainTableModel(dbc);
-        mainTable.setModel(mainTableModel);
-        initColumnSizes();
+        if (mainTable.isRowSelected(row)) {
+            CustomerContacts cc = new CustomerContacts(dbc, (int) model.getValueAt(row, 0));
+            mainTableModel = new MainTableModel(dbc);
+            mainTable.setModel(mainTableModel);
+            initColumnSizes();
+        }
     }
 
     private void accountsList(MainTableModel model) {
