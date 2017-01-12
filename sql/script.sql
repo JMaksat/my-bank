@@ -2,21 +2,20 @@ create database bankdb;
 create user scott with password 'tiger' superuser;
 create schema bank;
 
-CREATE TABLE bank.account_rest
+CREATE TABLE bank.customer_info
 (
-  rest_id serial NOT NULL,
-  account_id integer,
-  rest_sum real,
-  transaction_id integer,
-  rest_date date,
-  rest_time time without time zone,
-  CONSTRAINT account_rest_pkey PRIMARY KEY (rest_id),
-  CONSTRAINT rest_account_fk FOREIGN KEY (account_id)
-      REFERENCES bank.accounts (account_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE CASCADE,
-  CONSTRAINT rest_transaction_fk FOREIGN KEY (transaction_id)
-      REFERENCES bank.transactions (transaction_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE CASCADE
+  customer_id serial NOT NULL,
+  first_name character varying(64),
+  last_name character varying(64),
+  middle_name character varying(64),
+  birth_date date,
+  personal_id character varying(64),
+  is_resident boolean,
+  date_modified date,
+  is_active boolean,
+  user_id character varying(32),
+  date_created date,
+  CONSTRAINT customer_info_pkey PRIMARY KEY (customer_id)
 );
 
 /* - Bank account structure: BBB DDMMYYYY CCCCC TTT (e.g. 0032812201500152056). BBB - branch, DDMMYYYY - open date, CCCCC - counter which start from 0 every business day, TTT - type of the account (buffer, personal, interest, system) */
@@ -35,6 +34,46 @@ CREATE TABLE bank.accounts
   CONSTRAINT accounts_pkey PRIMARY KEY (account_id),
   CONSTRAINT account_owner_fk FOREIGN KEY (account_owner)
       REFERENCES bank.customer_info (customer_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+/*
+- Domestic transactions. Domestic transaction can be fulfilled from one account (dropdown-list) to second.
+- Transactions between banks. If transaction is incoming, then first account should be foreign and second is domestic. If transaction is outgoing, then the first account is domestic and second is foreign.
+- Transactions between banks should use special one buffer account.
+- Transaction contains several types of operations: Money transfer (incoming, outgoing, between domestic accounts...always from right to left), Refill, Withdrawal
+*/
+CREATE TABLE bank.transactions
+(
+  transaction_id serial NOT NULL,
+  operation_type integer,
+  is_reversed boolean,
+  transaction_sum real,
+  transaction_date date,
+  transaction_time time without time zone,
+  user_id character varying(32),
+  account_debit integer,
+  account_credit integer,
+  CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id),
+  CONSTRAINT account_debit_fk FOREIGN KEY (account_debit)
+      REFERENCES bank.accounts (account_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE
+);
+
+CREATE TABLE bank.account_rest
+(
+  rest_id serial NOT NULL,
+  account_id integer,
+  rest_sum real,
+  transaction_id integer,
+  rest_date date,
+  rest_time time without time zone,
+  CONSTRAINT account_rest_pkey PRIMARY KEY (rest_id),
+  CONSTRAINT rest_account_fk FOREIGN KEY (account_id)
+      REFERENCES bank.accounts (account_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE,
+  CONSTRAINT rest_transaction_fk FOREIGN KEY (transaction_id)
+      REFERENCES bank.transactions (transaction_id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
@@ -84,22 +123,6 @@ CREATE TABLE bank.customer_contacts
       ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
-CREATE TABLE bank.customer_info
-(
-  customer_id serial NOT NULL,
-  first_name character varying(64),
-  last_name character varying(64),
-  middle_name character varying(64),
-  birth_date date,
-  personal_id character varying(64),
-  is_resident boolean,
-  date_modified date,
-  is_active boolean,
-  user_id character varying(32),
-  date_created date,
-  CONSTRAINT customer_info_pkey PRIMARY KEY (customer_id)
-);
-
 CREATE TABLE bank.directory
 (
   dir_id serial NOT NULL,
@@ -111,29 +134,6 @@ CREATE TABLE bank.directory
   is_active boolean,
   user_id character varying(32),
   CONSTRAINT directory_pkey PRIMARY KEY (dir_id)
-);
-
-/*
-- Domestic transactions. Domestic transaction can be fulfilled from one account (dropdown-list) to second.
-- Transactions between banks. If transaction is incoming, then first account should be foreign and second is domestic. If transaction is outgoing, then the first account is domestic and second is foreign.
-- Transactions between banks should use special one buffer account.
-- Transaction contains several types of operations: Money transfer (incoming, outgoing, between domestic accounts...always from right to left), Refill, Withdrawal
-*/
-CREATE TABLE bank.transactions
-(
-  transaction_id serial NOT NULL,
-  operation_type integer,
-  is_reversed boolean,
-  transaction_sum real,
-  transaction_date date,
-  transaction_time time without time zone,
-  user_id character varying(32),
-  account_debit integer,
-  account_credit integer,
-  CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id),
-  CONSTRAINT account_debit_fk FOREIGN KEY (account_debit)
-      REFERENCES bank.accounts (account_id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION bank.change_customer_activity(
