@@ -31,6 +31,7 @@ CREATE TABLE bank.accounts
   user_id character varying(32),
   account_type integer,
   is_suspended boolean,
+  comment character varying(4000),
   CONSTRAINT accounts_pkey PRIMARY KEY (account_id),
   CONSTRAINT account_owner_fk FOREIGN KEY (account_owner)
       REFERENCES bank.customer_info (customer_id) MATCH SIMPLE
@@ -88,7 +89,10 @@ CREATE TABLE bank.bank_parameters
   active_from date,
   active_to date,
   user_id character varying(32),
-  CONSTRAINT bank_parameters_pkey PRIMARY KEY (parameter_id)
+  CONSTRAINT bank_parameters_pkey PRIMARY KEY (parameter_id),
+  CONSTRAINT bank_parameters_fkey FOREIGN KEY (parent_id)
+  REFERENCES bank.bank_parameters (parameter_id) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
 CREATE TABLE bank.customer_address
@@ -433,7 +437,7 @@ begin
 
    -- Adding void transaction
    insert into bank.transactions (operation_type, is_reversed, transaction_sum, transaction_date, transaction_time, user_id, account_debit, account_credit)
-   values (2, false, 0.0, now(), now(), user, 2, l_account_id) returning transaction_id into l_transaction_id;
+   values (14, false, 0.0, now(), now(), user, 2, l_account_id) returning transaction_id into l_transaction_id;
 
    -- Adding very first rest of theaccount and it is equal to 0
    insert into bank.account_rest (account_id, rest_sum, transaction_id, rest_date, rest_time)
