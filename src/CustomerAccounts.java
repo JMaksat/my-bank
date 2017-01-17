@@ -139,9 +139,9 @@ public class CustomerAccounts implements TableModelListener {
             }
             column = accountTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
             row = accountTable.getSelectionModel().getLeadSelectionIndex();
-            AccountTableModel model = (AccountTableModel) accountTable.getModel();
-            String columnName = model.getColumnName(column);
-            Object data = model.getValueAt(row, column);
+            //AccountTableModel model = (AccountTableModel) accountTable.getModel();
+            //String columnName = model.getColumnName(column);
+            //Object data = model.getValueAt(row, column);
         }
     }
 

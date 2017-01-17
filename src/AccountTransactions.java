@@ -101,9 +101,9 @@ public class AccountTransactions implements TableModelListener {
             }
             column = transactionTable.getColumnModel().getSelectionModel().getLeadSelectionIndex();
             row = transactionTable.getSelectionModel().getLeadSelectionIndex();
-            TransactionTableModel model = (TransactionTableModel) transactionTable.getModel();
-            String columnName = model.getColumnName(column);
-            Object data = model.getValueAt(row, column);
+            //TransactionTableModel model = (TransactionTableModel) transactionTable.getModel();
+            //String columnName = model.getColumnName(column);
+            //Object data = model.getValueAt(row, column);
         }
     }
 

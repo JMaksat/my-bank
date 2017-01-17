@@ -313,7 +313,7 @@ begin
 			     and d.dir_id = cc.contact_type) as contact_type
 		       , cc.value
 		    from bank.customer_contacts cc
-		   where cc.contact_id = p_customer_id
+		   where cc.customer_id = p_customer_id
 		     and cc.is_active = true;
    
     return rcur;
