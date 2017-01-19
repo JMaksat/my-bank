@@ -56,33 +56,30 @@ public class NewTransaction {
         comboType.setEnabled(true);
         comboType.setBounds(editOffset, 20, editLength, 22);
         comboType.setSelectedItem(comboType.getItemAt(0));
-        comboType.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if ((comboType.getSelectedIndex() != -1)) {
+        comboType.addActionListener(event -> {
+            if ((comboType.getSelectedIndex() != -1)) {
 
-                    if (comboType.getSelectedItem().toString().equals("REFILL")) {
-                        for (int i = 0; i < comboAccountDebit.getItemCount(); i++) {
-                            if (comboAccountDebit.getItemAt(i).toString().endsWith("15")) {
-                                comboAccountDebit.setSelectedIndex(i);
-                            }
+                if (comboType.getSelectedItem().toString().equals("REFILL")) {
+                    for (int i = 0; i < comboAccountDebit.getItemCount(); i++) {
+                        if (comboAccountDebit.getItemAt(i).toString().endsWith("15")) {
+                            comboAccountDebit.setSelectedIndex(i);
                         }
-                        comboAccountDebit.setEnabled(false);
-                        comboAccountCredit.setEnabled(true);
-
-                    } else if (comboType.getSelectedItem().toString().equals("WITHDRAWAL")) {
-                        for (int i = 0; i < comboAccountCredit.getItemCount(); i++) {
-                            if (comboAccountCredit.getItemAt(i).toString().endsWith("15")) {
-                                comboAccountCredit.setSelectedIndex(i);
-                            }
-                        }
-                        comboAccountDebit.setEnabled(true);
-                        comboAccountCredit.setEnabled(false);
-
-                    } else {
-                        comboAccountDebit.setEnabled(true);
-                        comboAccountCredit.setEnabled(true);
                     }
+                    comboAccountDebit.setEnabled(false);
+                    comboAccountCredit.setEnabled(true);
+
+                } else if (comboType.getSelectedItem().toString().equals("WITHDRAWAL")) {
+                    for (int i = 0; i < comboAccountCredit.getItemCount(); i++) {
+                        if (comboAccountCredit.getItemAt(i).toString().endsWith("15")) {
+                            comboAccountCredit.setSelectedIndex(i);
+                        }
+                    }
+                    comboAccountDebit.setEnabled(true);
+                    comboAccountCredit.setEnabled(false);
+
+                } else {
+                    comboAccountDebit.setEnabled(true);
+                    comboAccountCredit.setEnabled(true);
                 }
             }
         });
@@ -108,26 +105,19 @@ public class NewTransaction {
         buttonOk = new JButton("Save");
         buttonOk.setEnabled(true);
         buttonOk.setBounds(55, 150, 80, 22);
-        buttonOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        buttonOk.addActionListener(event -> {
                 if (checkFields()) {
                     insertData();
                     formDispose();
                 }
-            }
+
         });
         dlg.add(buttonOk);
 
         buttonCancel = new JButton("Cancel");
         buttonCancel.setEnabled(true);
         buttonCancel.setBounds(155, 150, 80, 22);
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                formDispose();
-            }
-        });
+        buttonCancel.addActionListener(event -> formDispose());
         dlg.add(buttonCancel);
 
         dlg.setVisible(true);

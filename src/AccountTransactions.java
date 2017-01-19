@@ -16,20 +16,14 @@ public class AccountTransactions implements TableModelListener {
     JDialog dlg;
     JTable transactionTable;
     TransactionTableModel transactionTableModel;
-    //JButton buttonReverse;
-    // JButton buttonAddTransaction;
     JPanel panel;
-    int horizTop = 0;
-    int vertTop = 0;
     int column = -1;
     int row = -1;
     int accountID;
-    int customerID;
 
-    public AccountTransactions(DBClass dbc, int accountID, int customerID) {
+    public AccountTransactions(DBClass dbc, int accountID) {
         this.dbc = dbc;
         this.accountID = accountID;
-        this.customerID = customerID;
 
         dlg = new JDialog();
         dlg.setLayout(null);
@@ -69,9 +63,9 @@ public class AccountTransactions implements TableModelListener {
     public void tableChanged(TableModelEvent e) {
         row = e.getFirstRow();
         column = e.getColumn();
-        TransactionTableModel model = (TransactionTableModel) e.getSource();
-        String columnName = model.getColumnName(column);
-        Object data = model.getValueAt(row, column);
+        //TransactionTableModel model = (TransactionTableModel) e.getSource();
+        //String columnName = model.getColumnName(column);
+        //Object data = model.getValueAt(row, column);
     }
 
     private void initColumnSizes() {
@@ -140,7 +134,7 @@ public class AccountTransactions implements TableModelListener {
                 allCols = meta.getColumnCount();
 
                 while (rs.next()) {
-                    Vector<String> allRec = new Vector<String>();
+                    Vector<String> allRec = new Vector<>();
                     for (int i = 0; i < allCols; i++) {
                         allRec.addElement(rs.getString(i + 1));
                     }

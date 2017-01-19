@@ -21,10 +21,6 @@ public class CustomerContacts {
     JPanel panelAddress;
     JLabel labelContacts;
     JLabel labelAddress;
-    int horizTop = 0;
-    int vertTop = 0;
-    int column = -1;
-    int row = -1;
     int customerID;
 
     public CustomerContacts(DBClass dbc, int customerID) {
@@ -131,7 +127,7 @@ public class CustomerContacts {
                 allCols = meta.getColumnCount();
 
                 while (rs.next()) {
-                    Vector<String> allRec = new Vector<String>();
+                    Vector<String> allRec = new Vector<>();
                     for (int i = 0; i < allCols; i++) {
                         allRec.addElement(rs.getString(i + 1));
                     }
@@ -217,7 +213,7 @@ public class CustomerContacts {
                 allCols = meta.getColumnCount();
 
                 while (rs.next()) {
-                    Vector<String> allRec = new Vector<String>();
+                    Vector<String> allRec = new Vector<>();
                     for (int i = 0; i < allCols; i++) {
                         allRec.addElement(rs.getString(i + 1));
                     }

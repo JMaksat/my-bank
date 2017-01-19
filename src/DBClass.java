@@ -16,8 +16,6 @@ public class DBClass {
     private static String user_name;
     private static String user_pass;
     Vector cache;
-    int colCount;
-    Vector<String> headers;
     private Connection conn = null;
     private CallableStatement stmt = null;
 
@@ -513,6 +511,9 @@ public class DBClass {
                 conn.rollback();
                 if (stmt.getInt(1) == -2) {
                     JOptionPane.showMessageDialog(null, "Insufficient funds on debit account!");
+                }
+                if (stmt.getInt(1) == -3) {
+                    JOptionPane.showMessageDialog(null, "One of the accounts is suspended. All transactions on this account is prohibited!");
                 }
             }
             stmt.close();

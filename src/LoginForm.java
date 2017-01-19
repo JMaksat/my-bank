@@ -65,21 +65,13 @@ public class LoginForm extends JFrame {
         getContentPane().add(logFrm);
         getRootPane().setDefaultButton(buttonOk);
 
-        buttonOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        buttonOk.addActionListener(event -> {
                 instantiateDBClass();
                 runApplication();
                 dispose();
-            }
-        });
+            });
 
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(1);
-            }
-        });
+        buttonCancel.addActionListener(event -> System.exit(1));
     }
 
     private void instantiateDBClass() {

@@ -69,23 +69,13 @@ public class CustomerAccounts implements TableModelListener {
         buttonAddAccount = new JButton("Add account");
         buttonAddAccount.setEnabled(true);
         buttonAddAccount.setBounds(horizTop + 370, vertTop + 420, 120, 22);
-        buttonAddAccount.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addAccount();
-            }
-        });
+        buttonAddAccount.addActionListener(event -> addAccount());
         dlg.add(buttonAddAccount);
 
         buttonTransactions = new JButton("Transactions");
         buttonTransactions.setEnabled(true);
         buttonTransactions.setBounds(horizTop + 500, vertTop + 420, 120, 22);
-        buttonTransactions.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                transactionList(accountTableModel);
-            }
-        });
+        buttonTransactions.addActionListener(event -> transactionList(accountTableModel));
         dlg.add(buttonTransactions);
 
         dlg.setVisible(true);
@@ -103,8 +93,8 @@ public class CustomerAccounts implements TableModelListener {
         row = e.getFirstRow();
         column = e.getColumn();
         AccountTableModel model = (AccountTableModel) e.getSource();
-        String columnName = model.getColumnName(column);
-        Object data = model.getValueAt(row, column);
+        //columnName = model.getColumnName(column);
+        //Object data = model.getValueAt(row, column);
 
         dbc.updateAccountInfo((int) model.getValueAt(row, 0),
                 (boolean) model.getValueAt(row, 4));
@@ -128,7 +118,7 @@ public class CustomerAccounts implements TableModelListener {
 
     private void transactionList(AccountTableModel model) {
         if (accountTable.isRowSelected(row)) {
-            AccountTransactions at = new AccountTransactions(dbc, (int) model.getValueAt(row, 0), customerID);
+            AccountTransactions at = new AccountTransactions(dbc, (int) model.getValueAt(row, 0));
         }
     }
 
@@ -176,7 +166,7 @@ public class CustomerAccounts implements TableModelListener {
                 allCols = meta.getColumnCount();
 
                 while (rs.next()) {
-                    Vector<String> allRec = new Vector<String>();
+                    Vector<String> allRec = new Vector<>();
                     for (int i = 0; i < allCols; i++) {
                         allRec.addElement(rs.getString(i + 1));
                     }

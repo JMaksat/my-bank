@@ -481,18 +481,35 @@ $BODY$
 declare
 l_rest_id integer;
 l_transaction_id integer;
+l_suspended boolean := false;
+k record;
 begin
-
-  if p_transaction_sum <= bank.get_account_rest(p_account_debit) then
-    insert into bank.transactions (operation_type, is_reversed, transaction_sum, transaction_date, transaction_time, user_id, account_debit, account_credit)
-      values (p_operation_type, p_is_reversed, p_transaction_sum, now(), now(), user, p_account_debit, p_account_credit) returning transaction_id into l_transaction_id;
-      
-    l_rest_id := bank.decrease_account_rest(p_account_debit, l_transaction_id, p_transaction_sum);
-    if (l_rest_id >= 0) then 
-      l_rest_id := bank.increase_account_rest(p_account_credit, l_transaction_id, p_transaction_sum);
+  
+  for k in (select t.is_suspended
+			  from bank.accounts t
+		     where t.account_id in (p_account_debit, p_account_credit))
+  loop
+    if k.is_suspended = true then
+	  l_suspended := true;
     end if;
-  else 
-    return -2;
+  end loop;
+  
+  if l_suspended = false then
+  
+    if p_transaction_sum <= bank.get_account_rest(p_account_debit) then
+      insert into bank.transactions (operation_type, is_reversed, transaction_sum, transaction_date, transaction_time, user_id, account_debit, account_credit)
+        values (p_operation_type, p_is_reversed, p_transaction_sum, now(), now(), user, p_account_debit, p_account_credit) returning transaction_id into l_transaction_id;
+		  
+      l_rest_id := bank.decrease_account_rest(p_account_debit, l_transaction_id, p_transaction_sum);
+      if (l_rest_id >= 0) then 
+        l_rest_id := bank.increase_account_rest(p_account_credit, l_transaction_id, p_transaction_sum);
+      end if;
+    else 
+      return -2;
+    end if;
+
+  else
+    return -3;
   end if;
 
   return l_rest_id;	

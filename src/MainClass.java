@@ -3,7 +3,7 @@
  */
 public class MainClass {
 
-    public static Boolean runApp = false;
+    //public static Boolean runApp = false;
     DBClass dbc;
     LoginForm lf;
 

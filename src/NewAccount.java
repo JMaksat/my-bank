@@ -84,13 +84,10 @@ public class NewAccount {
         buttonOk = new JButton("Save");
         buttonOk.setEnabled(true);
         buttonOk.setBounds(40, 150, 80, 22);
-        buttonOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (checkFields()) {
-                    insertData();
-                    formDispose();
-                }
+        buttonOk.addActionListener(event -> {
+            if (checkFields()) {
+                insertData();
+                formDispose();
             }
         });
         dlg.add(buttonOk);
@@ -98,12 +95,7 @@ public class NewAccount {
         buttonCancel = new JButton("Cancel");
         buttonCancel.setEnabled(true);
         buttonCancel.setBounds(140, 150, 80, 22);
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                formDispose();
-            }
-        });
+        buttonCancel.addActionListener(event -> formDispose());
         dlg.add(buttonCancel);
 
         dlg.setVisible(true);

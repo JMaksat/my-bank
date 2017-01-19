@@ -113,13 +113,10 @@ public class NewCustomer {
         buttonOk = new JButton("Save");
         buttonOk.setEnabled(true);
         buttonOk.setBounds(40, 210, 80, 22);
-        buttonOk.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (checkFields()) {
-                    insertData();
-                    formDispose();
-                }
+        buttonOk.addActionListener(event -> {
+            if (checkFields()) {
+                insertData();
+                formDispose();
             }
         });
         dlg.add(buttonOk);
@@ -127,17 +124,10 @@ public class NewCustomer {
         buttonCancel = new JButton("Cancel");
         buttonCancel.setEnabled(true);
         buttonCancel.setBounds(140, 210, 80, 22);
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                formDispose();
-            }
-        });
+        buttonCancel.addActionListener(event -> formDispose());
         dlg.add(buttonCancel);
 
         dlg.setVisible(true);
-
-
     }
 
     private void insertData() {

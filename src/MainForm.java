@@ -7,9 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.Enumeration;
@@ -46,52 +44,25 @@ public class MainForm implements TableModelListener {
         mainFrm.setTitle(TITLE);
         mainFrm.setLayout(null);
 
-        mainFrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         mainFrm.setSize(800, 600);
         mainFrm.setResizable(false);
         mainFrm.setLocationRelativeTo(null);
+        mainFrm.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we)
+            {
+                exitPrompt();
+            }
+        });
 
         this.dbc = dbc;
 
-        menuBar = new JMenuBar();
-        mainFrm.setJMenuBar(menuBar);
-
-        fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(fileMenu);
-
-        aboutItem = new JMenuItem("About", KeyEvent.VK_A);
-        aboutItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                JOptionPane.showMessageDialog(null,
-                        "MyBank is demo application which shows how to work with PostgreSQL, JDBC and SWING JTable.\n" +
-                                " \n" +
-                                "2016. Maksat E."
-                        , TITLE, JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        fileMenu.add(aboutItem);
-        fileMenu.addSeparator();
-
-        menuItem = new JMenuItem("Exit", KeyEvent.VK_E);
-        menuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-                System.exit(0);
-            }
-        });
-        fileMenu.add(menuItem);
-
+        initMenu();
 
         Dimension dim = new Dimension(780, 500);
-        mainTableModel = new MainTableModel(dbc);
-        mainTable = new JTable(mainTableModel);
-        mainTable.setPreferredScrollableViewportSize(dim);
-        mainTable.setFillsViewportHeight(true);
-        mainTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        mainTable.setCellSelectionEnabled(false);
-        mainTable.setColumnSelectionAllowed(false);
-        mainTable.setRowSelectionAllowed(true);
-        mainTable.getSelectionModel().addListSelectionListener(new RowListener());
+
+        initTable(dim);
 
         initColumnSizes();
 
@@ -102,77 +73,8 @@ public class MainForm implements TableModelListener {
         panel.add(scrollPane);
         mainFrm.add(panel);
 
-        mainTableModel.addTableModelListener(this);
+        initButtons();
 
-        buttonTransaction = new JButton("Transaction");
-        buttonTransaction.setEnabled(true);
-        buttonTransaction.setBounds(horizTop + 15, vertTop + 540, 120, 22);
-        buttonTransaction.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addTransaction();
-            }
-        });
-        mainFrm.add(buttonTransaction);
-
-        buttonContacts = new JButton("Contacts");
-        buttonContacts.setEnabled(true);
-        buttonContacts.setBounds(horizTop + 145, vertTop + 540, 120, 22);
-        buttonContacts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                contactList(mainTableModel);
-            }
-        });
-        mainFrm.add(buttonContacts);
-
-        buttonAccounts = new JButton("Accounts");
-        buttonAccounts.setEnabled(true);
-        buttonAccounts.setBounds(horizTop + 275, vertTop + 540, 120, 22);
-        buttonAccounts.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                accountsList(mainTableModel);
-            }
-        });
-        mainFrm.add(buttonAccounts);
-
-        buttonBlock = new JButton();
-        buttonBlock.setText("Block client");
-        buttonBlock.setBounds(horizTop + 405, vertTop + 540, 120, 22);
-        buttonBlock.setEnabled(true);
-        buttonBlock.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                unblockCustomer(mainTableModel);
-                checkBlocked(mainTableModel);
-            }
-        });
-        mainFrm.add(buttonBlock);
-
-        buttonAdd = new JButton("New customer");
-        buttonAdd.setBounds(horizTop + 535, vertTop + 540, 120, 22);
-        buttonAdd.setEnabled(true);
-        buttonAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addCustomer();
-            }
-        });
-        mainFrm.add(buttonAdd);
-
-        buttonExit = new JButton("Close");
-        buttonExit.setBounds(horizTop + 665, vertTop + 540, 120, 22);
-        buttonExit.setEnabled(true);
-        buttonExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-        mainFrm.add(buttonExit);
-
-        //mainFrm.setContentPane(mf)
         mainFrm.setVisible(true);
     }
 
@@ -180,8 +82,8 @@ public class MainForm implements TableModelListener {
         row = e.getFirstRow();
         column = e.getColumn();
         MainTableModel model = (MainTableModel) e.getSource();
-        String columnName = model.getColumnName(column);
-        Object data = model.getValueAt(row, column);
+        //String columnName = model.getColumnName(column);
+        //Object data = model.getValueAt(row, column);
 
         dbc.updateCustomerInfo((int) model.getValueAt(row, 0),
                 (String) model.getValueAt(row, 1),
@@ -247,8 +149,72 @@ public class MainForm implements TableModelListener {
 
     }
 
+    private void initMenu() {
+        menuBar = new JMenuBar();
+        mainFrm.setJMenuBar(menuBar);
+
+        fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        menuBar.add(fileMenu);
+
+        aboutItem = new JMenuItem("About", KeyEvent.VK_A);
+        aboutItem.addActionListener(event -> JOptionPane.showMessageDialog(null, "MyBank is demo application which shows " +
+                                "how to work with PostgreSQL, JDBC and SWING JTable.\n \n2016. Maksat E.",
+                        TITLE,
+                        JOptionPane.INFORMATION_MESSAGE)
+        );
+        fileMenu.add(aboutItem);
+        fileMenu.addSeparator();
+
+        menuItem = new JMenuItem("Exit", KeyEvent.VK_E);
+        menuItem.addActionListener(event -> exitPrompt());
+        fileMenu.add(menuItem);
+    }
+
+    private void initButtons() {
+        buttonTransaction = new JButton("Transaction");
+        buttonTransaction.setEnabled(true);
+        buttonTransaction.setBounds(horizTop + 15, vertTop + 540, 120, 22);
+        buttonTransaction.addActionListener(event -> addTransaction());
+        mainFrm.add(buttonTransaction);
+
+        buttonContacts = new JButton("Contacts");
+        buttonContacts.setEnabled(true);
+        buttonContacts.setBounds(horizTop + 145, vertTop + 540, 120, 22);
+        buttonContacts.addActionListener(event -> contactList(mainTableModel));
+        mainFrm.add(buttonContacts);
+
+        buttonAccounts = new JButton("Accounts");
+        buttonAccounts.setEnabled(true);
+        buttonAccounts.setBounds(horizTop + 275, vertTop + 540, 120, 22);
+        buttonAccounts.addActionListener(event -> accountsList(mainTableModel));
+        mainFrm.add(buttonAccounts);
+
+        buttonBlock = new JButton();
+        buttonBlock.setText("Block client");
+        buttonBlock.setBounds(horizTop + 405, vertTop + 540, 120, 22);
+        buttonBlock.setEnabled(true);
+        buttonBlock.addActionListener(event -> {
+            unblockCustomer(mainTableModel);
+            checkBlocked(mainTableModel);
+        });
+        mainFrm.add(buttonBlock);
+
+        buttonAdd = new JButton("New customer");
+        buttonAdd.setBounds(horizTop + 535, vertTop + 540, 120, 22);
+        buttonAdd.setEnabled(true);
+        buttonAdd.addActionListener(event -> addCustomer());
+        mainFrm.add(buttonAdd);
+
+        buttonExit = new JButton("Close");
+        buttonExit.setBounds(horizTop + 665, vertTop + 540, 120, 22);
+        buttonExit.setEnabled(true);
+        buttonExit.addActionListener(event -> exitPrompt());
+        mainFrm.add(buttonExit);
+    }
+
     private void initColumnSizes() {
-        Vector<TableColumn> vt = new Vector<TableColumn>();
+        Vector<TableColumn> vt = new Vector<>();
         vt.addElement(mainTable.getColumnModel().getColumn(0));
         vt.addElement(mainTable.getColumnModel().getColumn(1));
         vt.addElement(mainTable.getColumnModel().getColumn(2));
@@ -289,6 +255,19 @@ public class MainForm implements TableModelListener {
         column.setPreferredWidth(50);
     }
 
+    private void initTable(Dimension dim) {
+        mainTableModel = new MainTableModel(dbc);
+        mainTableModel.addTableModelListener(this);
+        mainTable = new JTable(mainTableModel);
+        mainTable.setPreferredScrollableViewportSize(dim);
+        mainTable.setFillsViewportHeight(true);
+        mainTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        mainTable.setCellSelectionEnabled(false);
+        mainTable.setColumnSelectionAllowed(false);
+        mainTable.setRowSelectionAllowed(true);
+        mainTable.getSelectionModel().addListSelectionListener(new RowListener());
+    }
+
     private class RowListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent event) {
             if (event.getValueIsAdjusting()) {
@@ -299,8 +278,8 @@ public class MainForm implements TableModelListener {
 
             if ((row > -1) && (column > -1)) {
                 MainTableModel model = (MainTableModel) mainTable.getModel();
-                String columnName = model.getColumnName(column);
-                Object data = model.getValueAt(row, column);
+                //String columnName = model.getColumnName(column);
+                //Object data = model.getValueAt(row, column);
                 checkBlocked(model);
             }
         }
@@ -338,7 +317,7 @@ public class MainForm implements TableModelListener {
                 allCols = meta.getColumnCount();
 
                 while (rs.next()) {
-                    Vector<String> allRec = new Vector<String>();
+                    Vector<String> allRec = new Vector<>();
                     for (int i = 0; i < allCols; i++) {
                         allRec.addElement(rs.getString(i + 1));
                     }
@@ -396,5 +375,22 @@ public class MainForm implements TableModelListener {
         }
 
 
+    }
+
+    private void exitPrompt() {
+        String ObjButtons[] = {"Yes","No"};
+        int PromptResult = JOptionPane.showOptionDialog(null,
+                "Are you sure you want to exit?",
+                TITLE,
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                ObjButtons,
+                ObjButtons[1]);
+        if(PromptResult == JOptionPane.YES_OPTION)
+        {
+            dbc.closeConnection();
+            System.exit(0);
+        }
     }
 }
