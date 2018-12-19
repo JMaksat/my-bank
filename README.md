@@ -1,4 +1,4 @@
-My-bank - is simple programm which demonsrates how is work almost every bank. Especially, program implements the work with customer data and his or her accounts.
+My-bank - is simple application which simulates bank core application to work with customers and accounts. 
 Program written in Java using Swing, and PostgreSQL database.
 
 Release date 21 March 2016.
